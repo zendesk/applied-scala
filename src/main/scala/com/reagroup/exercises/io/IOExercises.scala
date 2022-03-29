@@ -2,6 +2,10 @@ package com.reagroup.exercises.io
 
 import cats.effect.IO
 
+// val a: IO[A]
+// a.map(A => B) : IO[B]
+// a.flatMap(A => IO[B]) : IO[B}
+
 /**
   * These exercises are repurposed from https://github.com/lukestephenson/monix-adventures
   *
@@ -22,7 +26,7 @@ object IOExercises {
     * Here is some relevant documentation https://typelevel.org/cats-effect/docs/2.x/datatypes/io#describing-effects
     */
   def immediatelyExecutingIO(): IO[Int] =
-    ???
+    IO.pure(43)
 
   /**
     * Create an IO which when executed logs “hello world” (using `logger`)
@@ -36,7 +40,7 @@ object IOExercises {
     * instead of relying on a mocking framework.
     */
   def helloWorld(logger: String => Unit): IO[Unit] =
-    ???
+    IO(logger("hello world"))
 
   /**
     * Difference between `IO.apply` and `IO.pure`:
@@ -62,7 +66,7 @@ object IOExercises {
     * Hint: https://typelevel.org/cats-effect/docs/2.x/datatypes/io#raiseerror
     */
   def alwaysFailingTask(): IO[Unit] =
-    ???
+    IO.raiseError(new Exception())
 
   /**
     * This is a data type that represents an exception in our program.
@@ -76,7 +80,10 @@ object IOExercises {
     * If `msg` is not empty, log out the message using the `logger`
     */
   def logMessageOrFailIfEmpty(msg: String, logger: String => Unit): IO[Unit] =
-    ???
+    if (msg.isEmpty)
+      IO.raiseError(AppException("Log must not be empty"))
+    else
+      IO(logger(msg))
 
   /**
     * We're going to work with temperature next. We start off by creating tiny types for `Fahrenheit` and `Celsius`.
@@ -96,7 +103,7 @@ object IOExercises {
     * using `cToF` defined above.
     */
   def getCurrentTempInF(getCurrentTemp: IO[Celsius]): IO[Fahrenheit] =
-    ???
+    getCurrentTemp.map(celsius => cToF(celsius))
 
   /**
     * Suppose the Celsius to Fahrenheit conversion is complex so we have decided to refactor it out to a remote
@@ -109,7 +116,7 @@ object IOExercises {
     * without the need for a mocking framework.
     */
   def getCurrentTempInFAgain(getCurrentTemp: IO[Celsius], converter: Celsius => IO[Fahrenheit]): IO[Fahrenheit] =
-    ???
+    getCurrentTemp.flatMap(celsius => converter(celsius))
 
 
   /**
@@ -126,8 +133,18 @@ object IOExercises {
     *
     * Hint: https://typelevel.org/cats-effect/docs/2.x/datatypes/io#attempt
     */
-  def showCurrentTempInF(currentTemp: IO[Celsius], converter: Celsius => IO[Fahrenheit]): IO[String] =
-    ???
+  def showCurrentTempInF(currentTemp: IO[Celsius], converter: Celsius => IO[Fahrenheit]): IO[String] = {
+    val program = for {
+      celsius <- currentTemp
+      f <- converter(celsius)
+      msg = s"The temperature is ${f.value.toString}"
+    } yield msg
+
+    program.attempt.map {
+      case Left(error) => error.getMessage
+      case Right(value) => value
+    }
+  }
 
   /**
     * `UsernameError` and `Username` are tiny types we are going to use for the next exercise.
@@ -145,8 +162,13 @@ object IOExercises {
   /**
     * Use `mkUsername` to create a `Username` and if successful print the username, otherwise fail with a UsernameError.
     */
-  def mkUsernameThenPrint(username: String, logger: String => Unit): IO[Unit] =
-    ???
+  def mkUsernameThenPrint(username: String, logger: String => Unit): IO[Unit] = {
+    val errorOrUsername: Either[UsernameError, Username] = mkUsername(username)
+    IO
+      .fromEither(errorOrUsername)
+      .flatMap(validUsername => IO(logger(validUsername.value)))
+  }
+
 
 
   /**
@@ -159,9 +181,11 @@ object IOExercises {
     * > executing step 3
     */
   def explain(logger: String => Unit): IO[Unit] = {
-    IO(logger("executing step 1"))
-    IO(logger("executing step 2"))
-    IO(logger("executing step 3"))
+    for {
+      _ <- IO(logger("executing step 1"))
+      _ <- IO(logger("executing step 2"))
+      _ <- IO(logger("executing step 3"))
+    } yield ()
   }
 
   /**
@@ -170,7 +194,9 @@ object IOExercises {
     *
     * Hint: https://typelevel.org/cats-effect/docs/2.x/datatypes/io#unsaferunsync
     */
-  def execute[A](io: IO[A]): A =
-    ???
+  def execute[A](io: IO[A]): A = {
+    import cats.effect.unsafe.implicits.global
+    io.unsafeRunSync()
+  }
 
 }
