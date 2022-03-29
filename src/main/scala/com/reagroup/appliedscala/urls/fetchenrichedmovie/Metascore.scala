@@ -26,4 +26,9 @@ object Metascore {
     * `Metascore(75)`
     */
 
+  implicit val decoder: Decoder[Metascore] = (c: HCursor) => {
+    val decodeInt: Result[Int] = c.downField("Metascore").as[Int]
+    decodeInt.map(number => Metascore(number))
+  }
+
 }

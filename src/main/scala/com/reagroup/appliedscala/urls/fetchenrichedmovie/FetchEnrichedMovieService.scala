@@ -16,7 +16,9 @@ class FetchEnrichedMovieService(fetchMovie: MovieId => IO[Option[Movie]],
     * Hint: We know we are going to be chaining multiple effects in `IO` so let's start a for-comprehension.
     * Also pattern match on `Option` if you're stuck!
     **/
-  def fetch(movieId: MovieId): IO[Option[EnrichedMovie]] = ???
+  def fetch(movieId: MovieId): IO[Option[EnrichedMovie]] = {
+    ???
+  }
 
   /**
     * Given a `Movie`, we can call `fetchMetascore` using the `name` of the `Movie`.
