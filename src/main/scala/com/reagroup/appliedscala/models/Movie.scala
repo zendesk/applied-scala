@@ -12,5 +12,5 @@ object Movie {
     *
     * Hint: Use `deriveEncoder`
     */
-
+    implicit val movieEncoder: Encoder[Movie] = deriveEncoder[Movie]
 }

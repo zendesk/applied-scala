@@ -13,6 +13,7 @@ class PostgresqlRepository(transactor: Transactor[IO]) {
 
   case class MovieRow(name: String, synopsis: String, review: Option[Review])
 
+  // MovieId => IO[Option[Movie]]
   def fetchMovie(movieId: MovieId): IO[Option[Movie]] = {
 
     def toMovie(rows: Vector[MovieRow]): Option[Movie] = rows.headOption.map {
