@@ -12,7 +12,7 @@ object NewReviewValidator {
     * Hint: `Validated` has an Applicative instance.
     */
   def validate(review: NewReviewRequest): ValidatedNel[ReviewValidationError, ValidatedReview] =
-    (validateAuthor(review.author), validateComment(review.comment)).mapN(ValidatedReview)
+    (validateAuthor(review.author), validateComment(review.comment)).mapN((a,c) => ValidatedReview(a,c))
 
   /**
     * If `author` is empty, return an `InvalidNel` containing `ReviewAuthorTooShort`,

@@ -19,10 +19,11 @@ class FetchEnrichedMovieService(fetchMovie: MovieId => IO[Option[Movie]],
   def fetch(movieId: MovieId): IO[Option[EnrichedMovie]] = {
     for {
       maybeMovie <- fetchMovie(movieId) // IO[Option[Movie]]
-      maybeEnrichedMovie <- maybeMovie match {
-        case Some(movie) => enrichMovieWithMetascore(movie).map(enrichedMovie => Some(enrichedMovie)) // movie exists in DB, we want to enrich
-        case None => IO(None) // movie does not exist in DB
-      }
+      maybeEnrichedMovie <- maybeMovie.traverse(movie => enrichMovieWithMetascore(movie))
+//      maybeEnrichedMovie <- maybeMovie match {
+//        case Some(movie) => enrichMovieWithMetascore(movie).map(enrichedMovie => Some(enrichedMovie)) // movie exists in DB, we want to enrich
+//        case None => IO(None) // movie does not exist in DB
+//      }
     } yield maybeEnrichedMovie
   }
 
