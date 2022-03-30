@@ -1,11 +1,10 @@
 package com.reagroup.appliedscala.urls.savemovie
 
 import cats.data.Validated._
-import cats.data.{NonEmptyList, ValidatedNel}
+import cats.data.ValidatedNel
 import cats.effect.IO
 import com.reagroup.appliedscala.models._
-import io.circe.{Encoder, Json}
-import io.circe.syntax._
+import com.reagroup.appliedscala.urls.ErrorHandler
 import org.http4s._
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.dsl.Http4sDsl
@@ -19,6 +18,14 @@ class SaveMovieController(saveNewMovie: NewMovieRequest => IO[ValidatedNel[Movie
     * Hint: Use `Created(...)` to return a 201 response when the movie is successfully saved and `BadRequest(...)` to return a 403 response when there are errors.
     */
   def save(req: Request[IO]): IO[Response[IO]] =
-    ???
+    for {
+      newMovieRequest <- req.as[NewMovieRequest]
+      errorOrMovieId <- saveNewMovie(newMovieRequest).attempt
+      response <- errorOrMovieId match {
+        case Left(error) => ErrorHandler(error)
+        case Right(Valid(movieId)) => Created(movieId)
+        case Right(Invalid(validationErrors)) => BadRequest(validationErrors)
+      }
+    } yield response
 
 }
