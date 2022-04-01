@@ -1,19 +1,15 @@
 package com.reagroup.appliedscala.urls.repositories
 
 import org.specs2.mutable.Specification
-import cats.data.IdT
 import cats.effect.IO
 import cats.effect.kernel.Resource
 import io.circe.Json
 import io.circe.syntax._
-import org.http4s._
 import org.http4s.circe.CirceEntityEncoder._
-import org.http4s.implicits._
 import org.http4s.client.Client
-import org.http4s.dsl.{Http4sDsl, Http4sDsl2}
+import org.http4s.dsl.Http4sDsl
 import cats.effect.unsafe.implicits.global
 import com.reagroup.appliedscala.urls.fetchenrichedmovie.Metascore
-import cats.syntax.all._
 
 final class Http4sMetascoreRepositorySpec extends Specification with Http4sDsl[IO] {
   
