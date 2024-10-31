@@ -6,12 +6,12 @@ scalaVersion := "3.3.3"
 
 Compile / run / mainClass := Some("com.reagroup.appliedscala.Main")
 
-val catsVersion = "2.7.0"
+val catsVersion = "2.12.0"
 val circeVersion = "0.14.10"
-val http4sVersion = "0.23.11"
-val logbackVersion = "1.2.11"
-val postgresqlVersion = "42.2.4"
-val doobieVersion = "1.0.0-RC1"
+val http4sVersion = "0.23.29"
+val logbackVersion = "1.5.12"
+val postgresqlVersion = "42.7.4"
+val doobieVersion = "1.0.0-RC6"
 val specs2Version = "4.20.9"
 
 libraryDependencies ++= Seq(
@@ -26,8 +26,8 @@ libraryDependencies ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.typelevel"           %% "cats-core"              % catsVersion,
-  "org.http4s"              %% "http4s-blaze-server"    % http4sVersion,
-  "org.http4s"              %% "http4s-blaze-client"    % http4sVersion,
+  "org.http4s"              %% "http4s-ember-server"    % http4sVersion,
+  "org.http4s"              %% "http4s-ember-client"    % http4sVersion,
   "org.http4s"              %% "http4s-circe"           % http4sVersion,
   "org.http4s"              %% "http4s-dsl"             % http4sVersion,
   "ch.qos.logback"           % "logback-classic"        % logbackVersion,

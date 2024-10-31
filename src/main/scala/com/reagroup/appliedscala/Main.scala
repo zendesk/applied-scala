@@ -1,8 +1,9 @@
 package com.reagroup.appliedscala
 
 import cats.effect.{IO, IOApp}
+import com.comcast.ip4s.port
 import com.reagroup.appliedscala.config.Config
-import org.http4s.blaze.client.BlazeClientBuilder
+import org.http4s.ember.client.EmberClientBuilder
 
 object Main extends IOApp.Simple {
 
@@ -14,9 +15,12 @@ object Main extends IOApp.Simple {
   }
 
   private def runServerWith(config: Config): IO[Unit] = {
-    BlazeClientBuilder[IO].resource.use { httpClient =>
+    EmberClientBuilder.default[IO].build.use { httpClient =>
       val app = new AppRuntime(config, httpClient).routes
-      new AppServer(9200, app).start()
+      AppServer(port"9200", app).use { _ =>
+        // The server will keep running until the process is interrupted
+        IO.never
+      }
     }
   }
 

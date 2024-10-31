@@ -1,18 +1,20 @@
 package com.reagroup.appliedscala
 
-import cats.effect.IO
+import cats.effect.{IO, Resource}
+import com.comcast.ip4s.*
 import org.http4s.HttpApp
-import org.http4s.blaze.server.BlazeServerBuilder
+import org.http4s.ember.server.EmberServerBuilder
+import org.http4s.server.Server
 
-class AppServer(port: Int, service: HttpApp[IO]) {
+object AppServer {
 
-  def start(): IO[Unit] = {
-    BlazeServerBuilder[IO]
-      .bindHttp(port, "0.0.0.0")
+  def apply(port: Port, service: HttpApp[IO]): Resource[IO, Server] = {
+    EmberServerBuilder
+      .default[IO]
+      .withHost(ipv4"0.0.0.0")
+      .withPort(port)
       .withHttpApp(service)
-      .serve
-      .compile
-      .drain
+      .build
   }
 
 }
